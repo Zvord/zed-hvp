@@ -1,0 +1,11 @@
+name = "HVP"
+grammar = "hvp"
+path_suffixes = ["hvp"]
+line_comments = ["// "]
+block_comment = ["/*", "*/"]
+brackets = [
+    { start = "{", end = "}", close = true, newline = true },
+    { start = "[", end = "]", close = true, newline = true },
+    { start = "(", end = ")", close = true, newline = true },
+    { start = "\"", end = "\"", close = true, newline = false, not_in = ["comment", "string"] },
+]
