@@ -5,8 +5,8 @@ highlighting (via [`tree-sitter-hvp`](../tree-sitter-hvp)), diagnostics, autocom
 outline, and folding (via the [`hvp-language-server`](../hvp-language-server) Node-based
 language server).
 
-This extension cannot be loaded into a real Zed instance yet — see the two blockers
-below before assuming this "just works."
+This extension cannot be loaded into a real Zed instance yet — see the blocker below
+before assuming this "just works."
 
 ## Package layout
 
@@ -20,26 +20,20 @@ src/lib.rs                ← Extension impl: language_server_command via
 languages/hvp/config.toml ← path_suffixes, line_comments, block_comment, grammar = "hvp"
 ```
 
-## Two blockers
+## Remaining blocker
 
-1. **`[grammars.hvp]` points at a placeholder repository URL.** `tree-sitter-hvp` exists
-   only as a local git repo so far (no `git remote` configured). The `repository` field
-   uses the same `<your-username>` placeholder pattern already used in
-   `hvp-language-server/package.json` and `vscode-hvp/package.json`; `rev` is a real
-   commit SHA (`c2590672fa89828edcae00ad47765e5f3885879e`). Zed cannot actually
-   clone/build this grammar until the repository is pushed somewhere real and both
-   fields are updated.
-2. **`hvp-language-server` is not published to npm.** `language_server_command` calls
-   `zed::npm_package_latest_version("hvp-language-server")` /
-   `zed::npm_install_package(...)`, both of which hit the real npm registry at runtime —
-   same requirement `LSP-hvp/README.md` documents for Sublime. Until
-   `hvp-language-server@0.1.0` is published, the language server can never actually
-   start, even if the extension loads.
+`[grammars.hvp]` now points at `tree-sitter-hvp`'s real remote
+(`github.com/Zvord/tree-sitter-hvp`, pinned to its current `main` HEAD), so that half is
+resolved. The one still open: **`hvp-language-server` is not published to npm.**
+`language_server_command` calls `zed::npm_package_latest_version("hvp-language-server")` /
+`zed::npm_install_package(...)`, both of which hit the real npm registry at runtime — same
+requirement `LSP-hvp/README.md` documents for Sublime. Until `hvp-language-server@0.1.0`
+is published, the language server can never actually start, even if the extension loads.
 
-Given both, this extension cannot be verified end-to-end in a real Zed instance until
-both publishes happen.
+This extension cannot be verified end-to-end in a real Zed instance until that publish
+happens.
 
-## Setup (once both blockers are resolved)
+## Setup (once the blocker above is resolved)
 
 Requires `rustup` (stable) with the `wasm32-wasip2` target — **not** `wasm32-wasip1`;
 Zed's own docs (`docs/src/extensions/developing-extensions.md`) state extensions compile

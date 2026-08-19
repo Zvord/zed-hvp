@@ -4,7 +4,8 @@
 
 ```
 extension.toml            ← id "hvp", [language_servers.hvp] (languages = ["HVP"]),
-                             [grammars.hvp] (repository + rev — placeholder, see below)
+                             [grammars.hvp] (repository + rev, pinned to tree-sitter-hvp's
+                             main HEAD)
 Cargo.toml                ← zed_extension_api = "0.7.0" (current crates.io max version,
                              compatible with Zed 0.192.x per crates/extension_api/README.md)
 src/lib.rs                ← the entire extension: HvpExtension { did_find_server: bool },
@@ -68,22 +69,19 @@ not assumed:
   `blockComment` values exactly) since HVP has no documented block-comment continuation
   convention worth inventing a `prefix`/`tab_size` for.
 
-## Two things to resolve before this can load in a real Zed instance
+## One thing left to resolve before this can load in a real Zed instance
 
-1. **`extension.toml`'s `[grammars.hvp]` is a placeholder.** `repository =
-   "https://github.com/<your-username>/tree-sitter-hvp"` — `tree-sitter-hvp` has no git
-   remote configured yet (see `../tree-sitter-hvp/README.md`), so this URL resolves to
-   nothing. `rev = "c2590672fa89828edcae00ad47765e5f3885879e"` is a real commit SHA —
-   only `repository` needs fixing once the grammar repo is pushed somewhere real, and
-   `rev` should be bumped too if it has moved on by then.
-2. **`hvp-language-server` is not on npm.** Same requirement `LSP-hvp` documents — see
-   `../LSP-hvp/CLAUDE.md`'s "npm-publish requirement" section. `zed::npm_install_package`
-   and `zed::npm_package_latest_version` both hit the real npm registry; both calls 404
-   until `hvp-language-server@0.1.0` is published.
+`extension.toml`'s `[grammars.hvp]` now points at `tree-sitter-hvp`'s real remote
+(`github.com/Zvord/tree-sitter-hvp`), pinned via `rev` to that repo's current `main` HEAD
+— re-bump `rev` whenever the grammar changes. What's still open: **`hvp-language-server`
+is not on npm.** Same requirement `LSP-hvp` documents — see `../LSP-hvp/CLAUDE.md`'s
+"npm-publish requirement" section. `zed::npm_install_package` and
+`zed::npm_package_latest_version` both hit the real npm registry; both calls 404 until
+`hvp-language-server@0.1.0` is published.
 
-Neither is workable around locally the way `vscode-hvp`'s `file:../hvp-language-server`
-dependency is — Zed's extension host resolves both the grammar repository and the npm
-package against the real internet at install/run time, not against a local checkout.
+This isn't workable around locally the way `vscode-hvp`'s `file:../hvp-language-server`
+dependency is — Zed's extension host resolves the npm package against the real internet
+at install/run time, not against a local checkout.
 
 ## Verification done
 

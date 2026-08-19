@@ -3,22 +3,16 @@ name = "HVP"
 description = "HVP (Hierarchical Verification Plan) language support: diagnostics, completion, outline, folding via the hvp-language-server LSP, and syntax highlighting via tree-sitter-hvp."
 version = "0.1.0"
 schema_version = 1
-authors = ["<your-username> <you@example.com>"]
-repository = "https://github.com/<your-username>/zed-hvp"
+authors = ["Ilia Barkov <barkovian@gmail.com>"]
+repository = "https://github.com/Zvord/zed-hvp"
 
 [language_servers.hvp]
 name = "hvp-language-server"
 languages = ["HVP"]
 
-# PLACEHOLDER, not yet real (see ../MIGRATION.md and ../tree-sitter-hvp/CLAUDE.md):
-# `tree-sitter-hvp` exists only as a local git repo in this checkout, with no remote
-# configured. `repository` below mirrors the same `<your-username>` placeholder pattern
-# already used in hvp-language-server/package.json and vscode-hvp/package.json. `rev` is
-# the real current local HEAD commit of tree-sitter-hvp
-# (`git -C ../tree-sitter-hvp rev-parse HEAD`), not a placeholder -- but Zed still can't
-# fetch it until the repository URL points somewhere real. Update both fields once a
-# human pushes tree-sitter-hvp to an actual remote (repository -> the real URL, rev -> that
-# push's commit, or later commits as the grammar evolves).
+# `tree-sitter-hvp` now has a real remote (github.com/Zvord/tree-sitter-hvp); `rev` is
+# that repo's current `main` HEAD (`git -C ../tree-sitter-hvp rev-parse origin/main`).
+# Bump `rev` whenever tree-sitter-hvp's grammar changes.
 [grammars.hvp]
-repository = "https://github.com/<your-username>/tree-sitter-hvp"
-rev = "c2590672fa89828edcae00ad47765e5f3885879e"
+repository = "https://github.com/Zvord/tree-sitter-hvp"
+rev = "2cf51163cb887652b106879fba89d3f0c843a300"
