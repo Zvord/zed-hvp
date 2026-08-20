@@ -1,3 +1,4 @@
 *.wasm
 grammars
 target
+CLAUDE.md

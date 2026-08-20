@@ -2,11 +2,6 @@ use std::{env, fs};
 
 use zed_extension_api::{self as zed, LanguageServerId, Result};
 
-// hvp-language-server has not been published to npm yet (see ../hvp-language-server and
-// ../MIGRATION.md). npm_package_latest_version()/npm_install_package() below will fail
-// at runtime (registry 404) until a human runs the real `npm publish` for it -- this
-// extension cannot actually start the language server until then, even once loaded as
-// a dev extension.
 const PACKAGE_NAME: &str = "hvp-language-server";
 const SERVER_PATH: &str = "node_modules/hvp-language-server/bin/hvp-language-server.js";
 
