@@ -13,7 +13,19 @@ src/lib.rs                ← the entire extension: HvpExtension { did_find_serv
                              hvp-language-server via npm and launches it with node + --stdio
 languages/hvp/config.toml ← name "HVP", grammar = "hvp", path_suffixes ["hvp"],
                              line_comments ["// "], block_comment ["/*", "*/"], brackets
+languages/hvp/highlights.scm ← syntax highlighting query, byte-identical copy of
+                             ../tree-sitter-hvp/queries/highlights.scm — re-copy here
+                             whenever that file changes
+languages/hvp/outline.scm ← Outline-panel query: the 7 block-pair declarations
+                             (plan/feature/metric/measure/override/filter) plus
+                             subplan_statement, each as an @item with @context/@name
 ```
+
+Both `.scm` files are required for Zed to actually use the grammar once it's built —
+without them the extension loads and the LSP still provides diagnostics, but syntax
+highlighting and the Outline/symbols panel stay empty, since those two features are
+driven by tree-sitter queries discovered by filename convention in `languages/hvp/`,
+entirely separate from the LSP connection.
 
 `src/lib.rs` is modeled directly on
 [`zed-extensions/emmet`](https://github.com/zed-extensions/emmet)'s `src/lib.rs`. That
@@ -69,19 +81,13 @@ not assumed:
   `blockComment` values exactly) since HVP has no documented block-comment continuation
   convention worth inventing a `prefix`/`tab_size` for.
 
-## One thing left to resolve before this can load in a real Zed instance
+## Publish status
 
-`extension.toml`'s `[grammars.hvp]` now points at `tree-sitter-hvp`'s real remote
-(`github.com/Zvord/tree-sitter-hvp`), pinned via `rev` to that repo's current `main` HEAD
-— re-bump `rev` whenever the grammar changes. What's still open: **`hvp-language-server`
-is not on npm.** Same requirement `LSP-hvp` documents — see `../LSP-hvp/CLAUDE.md`'s
-"npm-publish requirement" section. `zed::npm_install_package` and
-`zed::npm_package_latest_version` both hit the real npm registry; both calls 404 until
-`hvp-language-server@0.1.0` is published.
-
-This isn't workable around locally the way `vscode-hvp`'s `file:../hvp-language-server`
-dependency is — Zed's extension host resolves the npm package against the real internet
-at install/run time, not against a local checkout.
+`hvp-language-server` is published to npm (`0.1.0`) and `extension.toml`'s
+`[grammars.hvp]` points at `tree-sitter-hvp`'s real remote
+(`github.com/Zvord/tree-sitter-hvp`), pinned via `rev` — re-bump `rev` whenever the
+grammar itself changes (metadata-only commits there don't require a re-pin). Both
+previous blockers on loading this in a real Zed instance are resolved.
 
 ## Verification done
 
@@ -96,11 +102,16 @@ at install/run time, not against a local checkout.
   `zed-extensions/emmet/extension.toml` (standalone, real, published) — same top-level
   keys (`id`, `name`, `description`, `version`, `schema_version`, `authors`,
   `repository`), same `[language_servers.<name>]` / `[grammars.<name>]` shapes.
+- `zed: install dev extension` in a real Zed instance: grammar fetch-and-build and
+  `npm install hvp-language-server` both succeeded, and diagnostics came through the LSP
+  connection correctly. Syntax highlighting and the Outline panel came up empty on that
+  first run — traced to `languages/hvp/` having no `highlights.scm`/`outline.scm` at
+  all (only `config.toml` existed), so there was nothing for Zed to query the grammar's
+  parse tree with. Both files have been added now (`highlights.scm` copied from
+  `tree-sitter-hvp/queries/highlights.scm`, `outline.scm` new) but **not yet
+  re-verified against a live Zed instance** — do that next.
 
-**Not yet done, blocked on the two items above:** `zed: install dev extension` in a
-real Zed instance, opening `../hvp-language-server/test/fixtures/realistic-sample.hvp`
-and confirming diagnostics/completion/outline/folding/highlighting, actual grammar
-fetch-and-build by Zed's extension host, actual `npm install` of `hvp-language-server`,
+**Not yet done:** re-confirm highlighting/outline in Zed with the new query files,
 `zed-industries/extensions` registry submission.
 
 ## Not this repo's job
